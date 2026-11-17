@@ -1,6 +1,6 @@
 const config = {
     "owners": ["2104469431001751552"],
-    "prefix": "f!!",
+    "prefix": "f!",
     "theme": "#A52F05",
     "emojis": {
         "one": "1️⃣",
