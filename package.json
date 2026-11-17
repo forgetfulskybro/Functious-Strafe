@@ -1,0 +1,18 @@
+{
+  "name": "functious-strafe",
+  "version": "1.0.0",
+  "description": "Functious but on Strafe.chat",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "dependencies": {
+    "@strafechat/strafe.js": "^2.0.0",
+    "dotenv": "^17.3.1",
+    "mongoose": "^9.11.2"
+  }
+}

@@ -1,0 +1,53 @@
+import { Schema, model } from 'mongoose';
+
+const guilds = new Schema({
+  id: { type: String },
+  prefix: { type: String, default: 'f!' },
+  theme: { type: String, default: '#A52F05' },
+  language: { type: String, default: 'en_EN' },
+  joined: { type: String, default: (Date.now() / 1000) | 0 },
+  dm: { type: Boolean, default: true },
+  pollPerm: { type: Boolean, default: true },
+  roles: { type: Array, default: [] },
+  joinRoles: { type: Array, default: [] },
+  stickyRolesEnabled: { type: Boolean, default: false },
+  stickyRoles: { type: Array, default: [] },
+  bypassRoles: { type: Array, default: [] },
+  timedRoles: { type: Array, default: [] },
+  usersJoined: { type: Array, default: [] },
+  timezoneConvert: { type: Boolean, default: false },
+  userTimezones: { type: Array, default: [] },
+  parentChannel: { type: String, default: null },
+  childChannel: { type: String, default: null },
+  tempChannels: { type: Array, default: [] },
+  scheduledMessages: { type: Array, default: [] },
+  config: {
+    channelName: { type: String, default: null },
+    channelLimit: { type: Number, default: null },
+    counting: { type: Boolean, default: false },
+    customParent: { type: String, default: null },
+    manage: { type: String, nullable: true, default: null },
+    manageMessage: { type: String, nullable: true, default: null },
+    managevc: { type: Boolean, default: false },
+  },
+  tags: { type: Array, default: [] },
+  mediaChannels: { type: Array, default: [] },
+  birthdayChannel: { type: String, default: null },
+  birthdayRole: { type: String, default: null },
+  birthdayPing: { type: Boolean, default: true },
+  birthdayBlacklist: { type: Array, default: [] },
+  birthdayMessageWithAge: { type: String, default: null },
+  birthdayMessageNoAge: { type: String, default: null },
+  birthdayPendingRemovals: {
+    type: [
+      {
+        userId: { type: String },
+        roleId: { type: String },
+        removeAt: { type: Number },
+      },
+    ],
+    default: [],
+  },
+});
+
+export default model('guilds', guilds);

@@ -1,0 +1,12 @@
+export default {
+    config: {
+        name: "",
+        usage: true,
+        cooldown: 5000,
+        available: true,
+        aliases: []
+    },
+    run: async (client, message, args) => {
+
+    },
+};

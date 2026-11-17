@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  functious:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - TOKEN=${TOKEN}
+      - MONGODB=${MONGODB}
+      - SECRET=${SECRET}
+      - BOTID=${BOTID}
+    ports:
+      - "8889:8889"
+    restart: unless-stopped
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.http.routers.functious.rule=Host(`functious.calaway.online`)"
+    #   - "traefik.http.routers.functious.entrypoints=websecure"
+    #   - "traefik.http.routers.functious.tls.certresolver=letsencrypt"
+    #   - "traefik.http.services.functious.loadbalancer.server.port=8889"
+    # networks:
+    #   - dokploy-network
+
+# networks:
+#   dokploy-network:
+#     external: true
