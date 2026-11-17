@@ -2,6 +2,7 @@ import collectorHandler from '../reactionHandlers/collector.js';
 import editCollectorHandler from '../reactionHandlers/editCollector.js';
 import roleReaction from '../reactionHandlers/roleReaction.js';
 import pagination from '../reactionHandlers/pagination.js';
+import pollHandler from '../reactionHandlers/poll.js';
 
 export default async (client, reaction, user) => {
   if (!reaction || !user) return;
@@ -18,6 +19,12 @@ export default async (client, reaction, user) => {
   }
 
   if (await pagination(client, reaction, user).catch(() => false)) return;
+
+  const pollCheck = client.polls.get(String(reaction.message?.id));
+  if (pollCheck) {
+    await pollHandler(client, reaction, user, pollCheck, 'add').catch(() => {});
+    return;
+  }
 
   await roleReaction(client, reaction, user, 'add').catch(() => {});
 

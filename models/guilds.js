@@ -32,22 +32,22 @@ const guilds = new Schema({
   },
   tags: { type: Array, default: [] },
   mediaChannels: { type: Array, default: [] },
-  birthdayChannel: { type: String, default: null },
-  birthdayRole: { type: String, default: null },
-  birthdayPing: { type: Boolean, default: true },
-  birthdayBlacklist: { type: Array, default: [] },
-  birthdayMessageWithAge: { type: String, default: null },
-  birthdayMessageNoAge: { type: String, default: null },
-  birthdayPendingRemovals: {
-    type: [
-      {
-        userId: { type: String },
-        roleId: { type: String },
-        removeAt: { type: Number },
-      },
-    ],
-    default: [],
-  },
+  // birthdayChannel: { type: String, default: null },
+  // birthdayRole: { type: String, default: null },
+  // birthdayPing: { type: Boolean, default: true },
+  // birthdayBlacklist: { type: Array, default: [] },
+  // birthdayMessageWithAge: { type: String, default: null },
+  // birthdayMessageNoAge: { type: String, default: null },
+  // birthdayPendingRemovals: {
+  //   type: [
+  //     {
+  //       userId: { type: String },
+  //       roleId: { type: String },
+  //       removeAt: { type: Number },
+  //     },
+  //   ],
+  //   default: [],
+  // },
 });
 
 export default model('guilds', guilds);

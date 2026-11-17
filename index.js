@@ -17,7 +17,7 @@ client.database.cacheSweeper(client);
 client.database.guildSweeper(client);
 client.createReactionCollector = (options) => new ReactionCollector(client, options);
 
-['used', 'timeout', 'messageCollector', 'messageEdit', 'reactions', 'paginate'].forEach((x) => (client[x] = new Map()));
+['used', 'timeout', 'messageCollector', 'messageEdit', 'reactions', 'paginate', 'polls'].forEach((x) => (client[x] = new Map()));
 ['aliases', 'commands', 'event', 'functions', 'reactionCollectors'].forEach((x) => (client[x] = new Collection()));
 
 for (const handler of ['command', 'event', 'function']) {

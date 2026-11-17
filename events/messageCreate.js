@@ -1,5 +1,6 @@
 import Collector from '../functions/messageCollector.js';
 import EditCollector from '../functions/messageEdit.js';
+import errorHandler from '../functions/errorHandler.js';
 import { baseEmbed, replyEmbed } from '../functions/embeds.js';
 import { prefixFor } from '../functions/prefix.js';
 import color from '../functions/colorCodes.js';
@@ -78,5 +79,6 @@ export default async (client, message) => {
     return await command.run(client, message, args, db);
   } catch (error) {
     console.error(color('%', '%4[Command_Error]%7 ::'), error);
+    await errorHandler({ type: 'command', client, message, error }).catch(() => {});
   }
 };
