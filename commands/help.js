@@ -1,4 +1,5 @@
 import { baseEmbed, replyEmbed } from '../functions/embeds.js';
+import { prefixFor } from '../functions/prefix.js';
 
 export default {
   config: {
@@ -9,8 +10,8 @@ export default {
     available: true,
     aliases: ['h', 'commands'],
   },
-  run: async (client, message, args) => {
-    const prefix = client.config.prefix;
+  run: async (client, message, args, db) => {
+    const prefix = prefixFor(client, db);
     const requested = args[0]?.toLowerCase();
     const isOwner = client.config.owners?.includes(message.author.id);
     const visible = (entry) =>

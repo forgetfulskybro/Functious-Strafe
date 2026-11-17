@@ -7,7 +7,9 @@ export default async function Collector(client, message) {
   const session = client.messageCollector.get(message.author.id);
   if (!session) return;
 
-  if (message.content.toLowerCase() === `${client.config.prefix}roles stop`) {
+  const prefix = session.prefix ?? client.config.prefix;
+
+  if (message.content.toLowerCase() === `${prefix}roles stop`) {
     clearTimeout(session.timer);
     client.messageCollector.delete(message.author.id);
     return replyEmbed(
@@ -22,7 +24,7 @@ export default async function Collector(client, message) {
     return replyError(
       client,
       message,
-      `No roles found. Use \`{role:Red}\` placeholders.\n\nType \`${client.config.prefix}roles stop\` to cancel.`,
+      `No roles found. Use \`{role:Red}\` placeholders.\n\nType \`${prefix}roles stop\` to cancel.`,
     );
   }
 
@@ -31,7 +33,7 @@ export default async function Collector(client, message) {
     return replyError(client, message, 'You can only add up to 30 roles per panel.');
   }
 
-  const resolved = await getRoles(roles, message, client);
+  const resolved = await getRoles(roles, message, client, prefix);
   if (!resolved) return;
 
   session.regex = roles;

@@ -4,7 +4,7 @@ import { resolveRoom } from './reply.js';
 const ROLE_MENTION = /^<@&(\d+)>$/;
 const SNOWFLAKE = /^\d+$/;
 
-export default async function getRoles(roles, message, client) {
+export default async function getRoles(roles, message, client, prefix = client.config.prefix) {
   let room;
   try {
     room = await resolveRoom(client, message.roomId);
@@ -41,7 +41,7 @@ export default async function getRoles(roles, message, client) {
     replyError(
       client,
       message,
-      `Unknown roles:\n${unknown.map((u) => `\`{role:${u}}\``).join(', ')}\n\nType \`${client.config.prefix}roles stop\` to cancel.`,
+      `Unknown roles:\n${unknown.map((u) => `\`{role:${u}}\``).join(', ')}\n\nType \`${prefix}roles stop\` to cancel.`,
     );
     return null;
   }
@@ -57,7 +57,7 @@ export default async function getRoles(roles, message, client) {
     replyError(
       client,
       message,
-      `Duplicate roles:\n${duplicates.map((r) => `\`{role:${r.name.trim()}}\``).join(', ')}\n\nType \`${client.config.prefix}roles stop\` to cancel.`,
+      `Duplicate roles:\n${duplicates.map((r) => `\`{role:${r.name.trim()}}\``).join(', ')}\n\nType \`${prefix}roles stop\` to cancel.`,
     );
     return null;
   }

@@ -1,6 +1,7 @@
 import Collector from '../functions/messageCollector.js';
 import EditCollector from '../functions/messageEdit.js';
 import { baseEmbed, replyEmbed } from '../functions/embeds.js';
+import { prefixFor } from '../functions/prefix.js';
 import color from '../functions/colorCodes.js';
 
 const BOT_ID = '2122536912249364480';
@@ -13,18 +14,23 @@ export default async (client, message) => {
 
   const userId = message.author.id;
   const roomId = message.roomId;
+  const db =
+    message.spaceId && client.database
+      ? await client.database.getGuild(message.spaceId).catch(() => null)
+      : null;
+  const prefix = prefixFor(client, db);
 
   const session = client.messageCollector.get(userId);
   if (session && !session.panelMessageId && session.roomId === roomId) {
+    session.prefix = prefix;
     return Collector(client, message);
   }
 
   const editSession = client.messageEdit.get(userId);
   if (editSession && !editSession.panelMessageId && editSession.roomId === roomId) {
+    editSession.prefix = prefix;
     return EditCollector(client, message);
   }
-
-  const prefix = client.config.prefix;
 
   if (!message.content.startsWith(prefix) && BOT_MENTION.test(message.content)) {
     return replyEmbed(
@@ -69,7 +75,7 @@ export default async (client, message) => {
   setTimeout(() => client.used.delete(usedKey), cooldown);
 
   try {
-    return await command.run(client, message, args);
+    return await command.run(client, message, args, db);
   } catch (error) {
     console.error(color('%', '%4[Command_Error]%7 ::'), error);
   }

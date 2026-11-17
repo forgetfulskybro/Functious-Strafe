@@ -5,6 +5,7 @@ import syncReactions from '../functions/syncReactions.js';
 import { panelsForSpace, getPanel, removePanel, updatePanel } from '../functions/panels.js';
 import { baseEmbed, replyError, successEmbed, replyEmbed } from '../functions/embeds.js';
 import { resolveRoom, sendTo } from '../functions/reply.js';
+import { prefixFor } from '../functions/prefix.js';
 
 const ROOM_MENTION = /<#(\d+)>/;
 const SETUP_TIMEOUT = 600_000;
@@ -13,8 +14,8 @@ const MANAGE_SUBCOMMANDS = ['create', 'edit', 'delete', 'fix', 'reactionfix', 'r
 const SETUP_EXAMPLE =
   '```\n**This is an example message**\n\n{mention}\nColor Roles:\n{role:Blue}\n{role:Red}\n{role:Purple}\n```';
 
-function helpEmbed(client) {
-  const p = client.config.prefix;
+function helpEmbed(client, prefix = client.config.prefix) {
+  const p = prefix;
 
   return baseEmbed(client).setTitle('Reaction Roles').setDescription(
     `**Explanation**\nWhen you create a reaction message (\`${p}roles create\`), you will need to provide it with roles (format: \`{role:Blue}\`) and I will copy your message. React to my message to automatically update the roles and once you are finished, react with ${client.config.emojis.check} to complete it.\n\n` +
@@ -99,9 +100,10 @@ export default {
     available: true,
     aliases: ['reactionroles', 'reactions', 'reactroles', 'reactionrole', 'rr'],
   },
-  run: async (client, message, args) => {
+  run: async (client, message, args, db) => {
     const userId = message.author.id;
     const roomId = message.roomId;
+    const prefix = prefixFor(client, db);
     const sub = (args[0] ?? 'help').toLowerCase();
 
     if (MANAGE_SUBCOMMANDS.includes(sub) && !(await requirePermissions(client, message))) return;
@@ -114,7 +116,7 @@ export default {
 
     switch (sub) {
       case 'help':
-        return replyEmbed(client, message, helpEmbed(client));
+        return replyEmbed(client, message, helpEmbed(client, prefix));
 
       case 'stop': {
         const collector = client.messageCollector.get(userId);
@@ -144,7 +146,7 @@ export default {
           return replyError(
             client,
             message,
-            `You already have an active message collector going on! Finish that first before starting a new one. If you would like to turn that collector off, run \`${client.config.prefix}roles stop\``,
+            `You already have an active message collector going on! Finish that first before starting a new one. If you would like to turn that collector off, run \`${prefix}roles stop\``,
           );
         }
 
@@ -183,6 +185,7 @@ export default {
           rolesDone: [],
           useMention: false,
           type,
+          prefix,
           rolePosition: 0,
           timer,
         });
@@ -198,7 +201,7 @@ export default {
           return replyError(
             client,
             message,
-            `There are no reaction role messages setup currently. To add some, type \`${client.config.prefix}roles\`.`,
+            `There are no reaction role messages setup currently. To add some, type \`${prefix}roles\`.`,
           );
         }
 
@@ -224,7 +227,7 @@ export default {
           return replyError(
             client,
             message,
-            `You already have an active message collector going on! Finish that first before starting a new one. If you would like to turn that collector off, run \`${client.config.prefix}roles stop\``,
+            `You already have an active message collector going on! Finish that first before starting a new one. If you would like to turn that collector off, run \`${prefix}roles stop\``,
           );
         }
         if (!args[1]) {
@@ -272,6 +275,7 @@ export default {
           useMention: panel.useMention,
           exclusive: panel.exclusive ?? false,
           type,
+          prefix,
           timer,
         });
         return;
@@ -359,7 +363,7 @@ export default {
       }
 
       default:
-        return replyEmbed(client, message, helpEmbed(client));
+        return replyEmbed(client, message, helpEmbed(client, prefix));
     }
   },
 };
