@@ -28,6 +28,10 @@ const FOOTER_SIZE = 17;
 const RADIUS = 8;
 const MIN_POLL_OPTIONS = 2;
 const MAX_POLL_OPTIONS = 10;
+const OPTION_LABEL_X = 30;
+const OPTION_DETAIL_SIZE = Math.max(10, Math.round(OPTION_SIZE * 0.7));
+const OPTION_DETAIL_GAP = 20;
+const OPTION_ZERO_DETAIL = '0% (0)';
 
 export function formatDuration(ms) {
   const total = Math.max(0, Math.round(Number(ms) / 1000));
@@ -45,20 +49,52 @@ export function formatDuration(ms) {
   return parts.join(' ') || '0s';
 }
 
+const measureCanvas = Canvas.createCanvas(1, 1);
+const measureCtx = measureCanvas.getContext('2d');
+measureCtx.font = `normal ${QUESTION_SIZE}px ${FONT}`;
+
+const optionMeasureCanvas = Canvas.createCanvas(1, 1);
+const optionMeasureCtx = optionMeasureCanvas.getContext('2d');
+
+export function titleFitsImage(text, poll) {
+  if (poll && typeof poll.titleTruncated === 'boolean') return !poll.titleTruncated;
+
+  const value = String(text ?? '').trim();
+  if (!value) return true;
+  if (value.length > 80) return false;
+
+  const normalized = value.replace(/\s+/g, ' ');
+  const [line] = wrapText(measureCtx, value, CANVAS_WIDTH - HEADER_BASE_X * 2, 1);
+  return line === normalized;
+}
+
+export function optionFitsImage(text, poll, index) {
+  const flag = poll?.optionTruncated?.[index];
+  if (typeof flag === 'boolean') return !flag;
+
+  const value = String(text ?? '');
+  if (!value) return true;
+
+  optionMeasureCtx.font = `normal ${OPTION_DETAIL_SIZE}px ${FONT}`;
+  const detailWidth = optionMeasureCtx.measureText(OPTION_ZERO_DETAIL).width;
+  optionMeasureCtx.font = `normal ${OPTION_SIZE}px ${FONT}`;
+  const maxWidth = BAR_WIDTH - OPTION_LABEL_X - (detailWidth + OPTION_DETAIL_GAP);
+  return optionMeasureCtx.measureText(value).width <= maxWidth;
+}
+
 export function collectTooMuch(poll) {
   const tooMuch = [];
 
-  if (poll.options.description?.length > 80) {
+  if (!titleFitsImage(poll.options.description, poll)) {
     tooMuch.push(`**Title**: ${poll.options.description}`);
   }
 
-  poll.voteOptions.name
-    .filter((e) => e)
-    .forEach((e, i) => {
-      if (e.length > 70) {
-        tooMuch.push(`**${i + 1}.** ${e}`);
-      }
-    });
+  poll.voteOptions.name.forEach((e, i) => {
+    if (!e) return;
+    if (!optionFitsImage(e, poll, i)) {
+      tooMuch.push(`**${i + 1}.** ${e}`);
+    }
+  });
 
   return tooMuch;
 }
@@ -138,6 +174,7 @@ export default class Polls {
     this.owner = owner;
     this.lang = lang;
     this.size = { canvas: pollCanvasHeight(names.length) };
+    this.optionTruncated = [];
     this.voteQueue = [];
     this.processing = false;
     this.debounceTimer = null;
@@ -246,11 +283,17 @@ export default class Polls {
     const headerWidth = width - HEADER_BASE_X * 2;
     const lineHeight = Math.round(QUESTION_SIZE * 1.3);
     const headerLines = wrapText(ctx, description, headerWidth, 1);
+    const fullDescription = String(this.options.description ?? '')
+      .trim()
+      .replace(/\s+/g, ' ');
+    this.titleTruncated =
+      this.options.description?.length > 80 || (headerLines[0] ?? '') !== fullDescription;
     ctx.textAlign = 'left';
     headerLines.forEach((line, index) => {
       ctx.fillText(line, headerX, headerY + index * lineHeight);
     });
 
+    this.optionTruncated = [];
     this.drawVoteBars(ctx, BAR_WIDTH, BAR_HEIGHT, this.votes, this.voteOptions.name);
     await this.drawFooter(ctx, width, height);
   }
@@ -387,8 +430,10 @@ export default class Polls {
       const rightSpace = percText ? percW + 20 : 8;
 
       ctx.font = `normal ${optionFontSize}px ${FONT}`;
-      const labelX = 30;
-      const nameText = fitText(ctx, String(names[i] ?? ''), width - labelX - rightSpace);
+      const labelX = OPTION_LABEL_X;
+      const fullName = String(names[i] ?? '');
+      const nameText = fitText(ctx, fullName, width - labelX - rightSpace);
+      this.optionTruncated[i] = nameText !== fullName;
       ctx.fillStyle = COLORS.text;
       const nameHeight = textHeight(nameText, ctx);
       ctx.fillText(nameText, labelX, y + height / 2 + nameHeight / 2);
