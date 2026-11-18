@@ -36,22 +36,35 @@ async function canManagePolls(client, message, db) {
   return false;
 }
 
-function helpEmbed(client, prefix) {
-  const text = [
+function helpText(client, prefix) {
+  const numbers = [
+    client.config.emojis?.one,
+    client.config.emojis?.two,
+    client.config.emojis?.three,
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  return [
     '**Usage**',
     `\`${prefix}poll <time> | <question> | <option> | <option>\``,
+    'Time accepts `s`, `m`, `h` and `d` (for example `5m` or `1h 30m`), from 30 seconds to 30 days. Polls need at least 2 and at most 10 options, separated by `|`.',
     '',
     '**Thread mode**',
     `\`${prefix}poll thread <time> | <question> | <option> | <option>\``,
-    'Posts the poll in the channel and opens a discussion thread on it.',
+    'Posts the poll in the room and opens a discussion thread on it.',
     '',
     '**Other**',
-    `\`${prefix}poll view\``,
-    `\`${prefix}poll delete <number>\``,
-    `\`${prefix}poll toggle\``,
+    `\`${prefix}poll view\` - Lists the polls you currently have running.`,
+    `\`${prefix}poll delete <number>\` - Ends one of your polls early.`,
+    `\`${prefix}poll toggle\` - Requires **Manage Space** before anyone can create a poll.`,
+    '',
+    `Vote with ${numbers || 'the number emojis'}, up to 10 options. Reactions have a 3 second cooldown, and the poll owner can end the poll early with ${client.config.emojis?.stop ?? 'the stop emoji'}.`,
   ].join('\n');
+}
 
-  return baseEmbed(client).setTitle('Polls').setDescription(text);
+function helpEmbed(client, prefix) {
+  return baseEmbed(client).setTitle('Polls').setDescription(helpText(client, prefix));
 }
 
 export default {
@@ -59,6 +72,7 @@ export default {
     name: 'polls',
     description: 'Creates a poll. Reactions have 3 second cooldown.',
     usage: '[time] | [question] | [option 1] | [option 2] | [options 3-10 (optional)]',
+    help: (client, prefix) => helpText(client, prefix),
     cooldown: 7000,
     available: true,
     aliases: ['poll'],

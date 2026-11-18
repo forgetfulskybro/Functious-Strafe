@@ -1,5 +1,5 @@
 import getRoles from './getRoles.js';
-import { panelEmbed, replyEmbed, replyError, successEmbed } from './embeds.js';
+import { panelEmbed, replyEmbed, replySetupError, successEmbed } from './embeds.js';
 
 const ROLE_TOKEN = /\{role:\s*(.*?)\s*\}/gi;
 
@@ -21,7 +21,7 @@ export default async function Collector(client, message) {
 
   const found = message.content.match(ROLE_TOKEN);
   if (!found || found.length === 0) {
-    return replyError(
+    return replySetupError(
       client,
       message,
       `No roles found. Use \`{role:Red}\` placeholders.\n\nType \`${prefix}roles stop\` to cancel.`,
@@ -30,7 +30,7 @@ export default async function Collector(client, message) {
 
   const roles = found.map((token) => token.match(/\{role:\s*(.*?)\s*\}/i)[1]);
   if (roles.length > 30) {
-    return replyError(client, message, 'You can only add up to 30 roles per panel.');
+    return replySetupError(client, message, 'You can only add up to 30 roles per panel.');
   }
 
   const resolved = await getRoles(roles, message, client, prefix);

@@ -51,9 +51,16 @@ export default {
         });
       }
 
+      const guide =
+        typeof command.config.help === 'function'
+          ? command.config.help(client, prefix)
+          : null;
+
       embed.addFields({
-        name: 'Usage',
-        value: `\`\`\`\n${prefix}${command.config.name} ${usage}\n\`\`\``,
+        name: guide ? 'Usage & Subcommands' : 'Usage',
+        value: guide
+          ? String(guide).slice(0, 1024)
+          : `\`\`\`\n${prefix}${command.config.name} ${usage}\n\`\`\``,
         inline: false,
       });
 

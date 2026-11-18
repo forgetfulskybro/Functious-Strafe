@@ -49,6 +49,10 @@ export async function replyEmbed(client, message, embed) {
 }
 
 export async function replyError(client, message, description) {
-  const sent = await replyEmbed(client, message, errorEmbed(client, description));
-  return deleteAfter(sent);
+  return replyEmbed(client, message, errorEmbed(client, description));
+}
+
+// Only the interactive reaction role setup should remove its own errors.
+export async function replySetupError(client, message, description) {
+  return deleteAfter(await replyError(client, message, description));
 }

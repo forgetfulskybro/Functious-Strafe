@@ -1,4 +1,4 @@
-import { replyError } from './embeds.js';
+import { replySetupError } from './embeds.js';
 import { resolveRoom } from './reply.js';
 
 const ROLE_MENTION = /^<@&(\d+)>$/;
@@ -9,13 +9,13 @@ export default async function getRoles(roles, message, client, prefix = client.c
   try {
     room = await resolveRoom(client, message.roomId);
   } catch {
-    replyError(client, message, 'I could not read this room or its roles.');
+    replySetupError(client, message, 'I could not read this room or its roles.');
     return null;
   }
 
   const space = room.space;
   if (!space) {
-    replyError(client, message, 'I could not read this room or its roles.');
+    replySetupError(client, message, 'I could not read this room or its roles.');
     return null;
   }
 
@@ -38,7 +38,7 @@ export default async function getRoles(roles, message, client, prefix = client.c
   }
 
   if (unknown.length) {
-    replyError(
+    replySetupError(
       client,
       message,
       `Unknown roles:\n${unknown.map((u) => `\`{role:${u}}\``).join(', ')}\n\nType \`${prefix}roles stop\` to cancel.`,
@@ -54,7 +54,7 @@ export default async function getRoles(roles, message, client, prefix = client.c
   }
 
   if (duplicates.length) {
-    replyError(
+    replySetupError(
       client,
       message,
       `Duplicate roles:\n${duplicates.map((r) => `\`{role:${r.name.trim()}}\``).join(', ')}\n\nType \`${prefix}roles stop\` to cancel.`,
